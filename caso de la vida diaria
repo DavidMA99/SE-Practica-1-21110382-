@@ -1,0 +1,80 @@
+# Proyecto: Algoritmo_Vida_Diaria 
+# Materia: Sistemas Expertos - 7mo Ingeniería Mecatrónica
+# Descripción:
+# Chat que usa un Árbol de Decisión para recomendar comida
+# a partir de datos simples de la rutina diaria.
+
+from sklearn.tree import DecisionTreeClassifier
+import numpy as np
+
+# --- Dataset inicial ---
+# Variables: [hambre, tiempo, antojo]
+# hambre: 0 = nada, 1 = poca, 2 = mucha
+# tiempo: 0 = rapido, 1 = normal, 2 = mucho
+# antojo: 0 = salado, 1 = dulce, 2 = saludable
+X = np.array([
+    [2, 0, 0],  # mucha hambre, poco tiempo, salado -> tacos
+    [2, 1, 0],  # mucha hambre, tiempo normal, salado -> pizza
+    [2, 1, 1],  # mucha hambre, tiempo normal, dulce -> hotcakes
+    [2, 1, 2],  # mucha hambre, tiempo normal, saludable -> ensalada
+    [2, 2, 0],  # mucha hambre, mucho tiempo, salado -> guiso
+    [1, 1, 1],  # poca hambre, normal, dulce -> postre
+    [1, 0, 0],  # poca hambre, rápido, salado -> sandwich
+    [1, 1, 2],  # poca hambre, normal, saludable -> fruta
+    [0, 0, 0],  # nada de hambre -> agua
+    [0, 1, 1],  # nada de hambre -> té
+])
+
+# Resultados esperados (recomendación)
+y = [
+    "Tacos 🌮",
+    "Pizza 🍕",
+    "Hotcakes 🥞",
+    "Ensalada 🥗",
+    "Guiso casero 🍲",
+    "Postre 🍩",
+    "Sandwich 🥪",
+    "Fruta 🍎",
+    "Agua 💧",
+    "Té 🍵"
+]
+
+# Entrenamiento del modelo
+modelo = DecisionTreeClassifier()
+modelo.fit(X, y)
+
+# Mapas de conversión para entradas
+mapa_hambre = {"nada": 0, "poca": 1, "mucha": 2}
+mapa_tiempo = {"rapido": 0, "normal": 1, "mucho": 2}
+mapa_antojo = {"salado": 0, "dulce": 1, "saludable": 2}
+
+def chat():
+    print("=== Bienvenido al Chat IA: ¿Qué comer hoy? ===")
+    print("Opciones válidas -> hambre: [nada, poca, mucha], tiempo: [rapido, normal, mucho], antojo: [salado, dulce, saludable]")
+    print("Escribe 'salir' para terminar.\n")
+
+    while True:
+        hambre = input("¿Tienes mucha, poca o nada de hambre? ").lower()
+        if hambre == "salir":
+            break
+
+        tiempo = input("¿Tienes tiempo rápido, normal o mucho? ").lower()
+        if tiempo == "salir":
+            break
+
+        antojo = input("¿Qué prefieres: salado, dulce o saludable? ").lower()
+        if antojo == "salir":
+            break
+
+        if hambre in mapa_hambre and tiempo in mapa_tiempo and antojo in mapa_antojo:
+            entrada = [[mapa_hambre[hambre], mapa_tiempo[tiempo], mapa_antojo[antojo]]]
+            recomendacion = modelo.predict(entrada)[0]
+            print("\nBot IA: Te recomiendo ->", recomendacion, "\n")
+        else:
+            print("No entendí tu respuesta, intenta de nuevo.\n")
+
+    print("Chat finalizado. ¡Que tengas buen provecho! 😋")
+
+# Punto de entrada
+if __name__ == "__main__":
+    chat()
